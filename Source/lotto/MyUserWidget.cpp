@@ -114,6 +114,11 @@ void UMyUserWidget::NativeConstruct()
     {
         LoginButton->OnClicked.AddDynamic(this, &UMyUserWidget::OnLoginButtonClicked);
     }
+
+    if (GetAllUsersButton)
+    {
+        GetAllUsersButton->OnClicked.AddDynamic(this, &UMyUserWidget::OnGetAllUsersButtonClicked);
+    }
 }
 
 void UMyUserWidget::OnLoginButtonClicked()
@@ -123,4 +128,33 @@ void UMyUserWidget::OnLoginButtonClicked()
 
     FString LoginUrl = TEXT("http://localhost:8080/api/login");
     RequestUserApi(LoginUrl, Email, Password);
+}
+
+void UMyUserWidget::OnGetAllUsersButtonClicked()
+{
+    FString ApiUrl = TEXT("http://localhost:8080/api/users");
+    RequestGetAllUsersApi(ApiUrl);
+}
+
+void UMyUserWidget::RequestGetAllUsersApi(const FString& ApiUrl)
+{
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = FHttpModule::Get().CreateRequest();
+    HttpRequest->SetVerb("GET");
+    HttpRequest->SetURL(ApiUrl);
+    HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+    HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+        {
+            if (bWasSuccessful)
+            {
+                FString ResponseStr = Response->GetContentAsString();
+                UE_LOG(LogTemp, Log, TEXT("HTTP 요청 성공: %s"), *ResponseStr);
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("HTTP 요청 실패"));
+            }
+        });
+
+    HttpRequest->ProcessRequest();
 }

@@ -36,6 +36,15 @@ public:
     UFUNCTION()
         void OnLoginButtonClicked();
 
+    UFUNCTION()
+        void OnGetAllUsersButtonClicked();
+
+    UFUNCTION()
+        void RequestGetAllUsersApi(const FString& ApiUrl);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lotto", meta = (BindWidget))
+        class UButton* GetAllUsersButton;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Lotto")
         TArray<int32> LottoNumbers;
 
